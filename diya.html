@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Diya Thorani">
+  <meta name="description" content="Domain Authority Estimator Tool - Check simulated DA, Spam Score & Backlink Strength for any domain. Perfect for SEO analysis.">
+  <title>Domain Authority Estimator | SEO Tool by Diya Thorani</title>
+  <!-- Google Fonts + Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f4f7fc 0%, #eef2f5 100%);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* main card container */
+    .estimator-card {
+      max-width: 760px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .estimator-card:hover {
+      box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.25);
+    }
+
+    /* header with gradient and purpose highlight */
+    .card-header {
+      background: linear-gradient(135deg, #1a2a3f 0%, #0f1a2a 100%);
+      padding: 1.8rem 2rem 1.5rem 2rem;
+      color: white;
+    }
+
+    .card-header h1 {
+      font-weight: 700;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-header h1 i {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 60%;
+      font-size: 1.6rem;
+    }
+
+    /* PURPOSE SECTION - instantly visible and clear */
+    .purpose-badge {
+      background: rgba(59, 130, 246, 0.15);
+      backdrop-filter: blur(4px);
+      border-radius: 1.2rem;
+      padding: 1rem 1.2rem;
+      margin-top: 1rem;
+      border-left: 4px solid #3b82f6;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .purpose-icon {
+      background: #3b82f6;
+      width: 42px;
+      height: 42px;
+      border-radius: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .purpose-text {
+      flex: 1;
+    }
+
+    .purpose-text strong {
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .purpose-text p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    .tooltip-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      background: rgba(255,255,240,0.1);
+      padding: 6px 14px;
+      border-radius: 40px;
+      width: fit-content;
+    }
+
+    .tooltip-info i {
+      font-size: 0.8rem;
+    }
+
+    .tooltip-info .help-text {
+      cursor: help;
+      border-bottom: 1px dashed rgba(255,255,255,0.6);
+    }
+
+    /* body content */
+    .card-body {
+      padding: 2rem 2rem 2rem 2rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      flex: 3;
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8e9aaf;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    #domainInput {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      font-size: 1rem;
+      font-family: 'Inter', monospace;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 60px;
+      background: #fefefe;
+      transition: all 0.25s;
+      font-weight: 500;
+      outline: none;
+    }
+
+    #domainInput:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    .button-group {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(100deg, #2563eb, #1e40af);
+      border: none;
+      padding: 0 1.5rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      height: 52px;
+    }
+
+    .btn-primary i {
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(100deg, #1d4ed8, #172554);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 18px -8px rgba(37,99,235,0.4);
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      padding: 0 1.2rem;
+      border-radius: 60px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 52px;
+    }
+
+    .btn-reset:hover {
+      background: #e2e8f0;
+      transform: scale(0.97);
+    }
+
+    /* error message */
+    .error-msg {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 12px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      border-left: 4px solid #ef4444;
+    }
+
+    /* loading animation */
+    .loading-container {
+      background: #f8fafc;
+      border-radius: 28px;
+      padding: 24px;
+      text-align: center;
+      margin: 20px 0 10px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 44px;
+      height: 44px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* results section */
+    .results-area {
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #edf2f7;
+      transition: all 0.2s;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .metric-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-title i {
+      color: #3b82f6;
+      width: 28px;
+    }
+
+    .metric-value {
+      font-weight: 800;
+      font-size: 1.7rem;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+
+    .progress-bg {
+      background: #e9eef3;
+      border-radius: 40px;
+      height: 12px;
+      width: 100%;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      border-radius: 40px;
+      transition: width 1.2s cubic-bezier(0.22, 0.97, 0.36, 1.02);
+    }
+
+    .sub-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #334155;
+      border-top: 1px dashed #e2e8f0;
+      padding-top: 14px;
+    }
+
+    .sub-item {
+      background: #f1f5f9;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* circular meter alternative (for DA) */
+    .circular-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .circular-progress {
+      width: 90px;
+      height: 90px;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .circular-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: #0f172a;
+    }
+
+    .score-info {
+      flex: 1;
+    }
+
+    /* Footer / Credit Section */
+    .footer-credit {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #eef2f6;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .footer-credit a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer-credit a:hover {
+      text-decoration: underline;
+    }
+
+    .heart-icon {
+      color: #ef4444;
+      display: inline-block;
+      animation: heartbeat 1.5s ease infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* responsiveness */
+    @media (max-width: 600px) {
+      .card-body {
+        padding: 1.5rem;
+      }
+      .input-group {
+        flex-direction: column;
+      }
+      .button-group {
+        width: 100%;
+      }
+      .btn-primary, .btn-reset {
+        flex: 1;
+        justify-content: center;
+      }
+      .metric-value {
+        font-size: 1.3rem;
+      }
+      .purpose-badge {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .purpose-icon {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="estimator-card">
+  <div class="card-header">
+    <h1>
+      <i class="fas fa-chart-line"></i> 
+      Domain Authority Estimator
+    </h1>
+    
+    <!-- CRYSTAL CLEAR PURPOSE SECTION -->
+    <div class="purpose-badge">
+      <div class="purpose-icon">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <div class="purpose-text">
+        <strong><i class="fas fa-bullseye"></i> What is this tool for?</strong>
+        <p>Domain Authority (DA) predicts how well a website ranks on Google & search engines. <br>
+        Enter any domain → get instant simulated DA score (1-100), Spam Score & Backlink Strength. <br>
+        <span style="font-size:0.75rem; opacity:0.8;">✅ Perfect for SEO audits, competitor analysis, and website strength estimation.</span></p>
+      </div>
+    </div>
+    
+    <div class="tooltip-info">
+      <i class="fas fa-lightbulb"></i>
+      <span class="help-text" title="Domain Authority (DA) is a search engine ranking score developed by Moz. Higher DA means stronger ability to rank. Our tool simulates realistic metrics based on domain structure, keywords, and TLD patterns.">
+        Learn about Domain Authority <i class="fas fa-question-circle"></i>
+      </span>
+    </div>
+  </div>
+  <div class="card-body">
+    <!-- Input section with hint -->
+    <div class="input-group">
+      <div class="input-wrapper">
+        <i class="fas fa-globe"></i>
+        <input type="text" id="domainInput" placeholder="example.com | google.com | github.io" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="button-group">
+        <button class="btn-primary" id="checkBtn"><i class="fas fa-search"></i> Check Authority</button>
+        <button class="btn-reset" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+      </div>
+    </div>
+
+    <!-- Error container -->
+    <div id="errorContainer"></div>
+
+    <!-- Loading animation -->
+    <div id="loadingArea" style="display: none;">
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p style="margin-top: 12px; font-weight: 500; color: #334155;"><i class="fas fa-chart-line"></i> Analyzing domain metrics & backlinks...</p>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <div id="resultsPanel" style="display: none;"></div>
+    
+    <!-- Footer with Credits - Diya Thorani -->
+    <div class="footer-credit">
+      <i class="fas fa-code"></i> Developed with <span class="heart-icon"><i class="fas fa-heart"></i></span> by <strong>Diya Thorani</strong> | 
+      <a href="#" target="_blank"><i class="fab fa-github"></i> GitHub Repository</a> | 
+      <i class="fas fa-chart-simple"></i> Simulated SEO Metrics
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ============================================
+    // DOMAIN AUTHORITY ESTIMATOR - CORE LOGIC
+    // Created with ❤️ by: Diya Thorani
+    // GitHub: https://github.com/diyathorani
+    // Free to use, modify and share with attribution
+    // ============================================
+    
+    // DOM elements
+    const domainInput = document.getElementById('domainInput');
+    const checkBtn = document.getElementById('checkBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const errorContainer = document.getElementById('errorContainer');
+    const loadingArea = document.getElementById('loadingArea');
+    const resultsPanel = document.getElementById('resultsPanel');
+
+    // Helper: clear error messages
+    function clearError() {
+      errorContainer.innerHTML = '';
+    }
+
+    // display error
+    function showError(message) {
+      errorContainer.innerHTML = `
+        <div class="error-msg">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      resultsPanel.style.display = 'none';
+      loadingArea.style.display = 'none';
+    }
+
+    // Domain validation regex (robust but user-friendly)
+    function isValidDomain(domain) {
+      if (!domain || domain.trim() === '') return false;
+      let domainStr = domain.trim().toLowerCase();
+      // Remove protocol if accidentally added
+      domainStr = domainStr.replace(/^(https?:\/\/)/i, '');
+      domainStr = domainStr.replace(/^www\./, '');
+      // Remove trailing slash or path
+      domainStr = domainStr.split('/')[0];
+      // Standard domain regex: allows subdomain, main domain, tld 2-6 chars, numbers, hyphens (not start/end)
+      const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
+      return domainRegex.test(domainStr);
+    }
+
+    // Normalize domain input (clean it)
+    function normalizeDomain(raw) {
+      let cleaned = raw.trim().toLowerCase();
+      cleaned = cleaned.replace(/^(https?:\/\/)/i, '');
+      cleaned = cleaned.replace(/^www\./, '');
+      cleaned = cleaned.split('/')[0];
+      return cleaned;
+    }
+
+    // Generate realistic Domain Authority (DA) score 1-100
+    function generateDomainAuthority(domain) {
+      const len = domain.length;
+      let lengthScore = 0;
+      if (len <= 7) lengthScore = 80 + (Math.random() * 12);
+      else if (len <= 12) lengthScore = 68 + (Math.random() * 14);
+      else if (len <= 18) lengthScore = 52 + (Math.random() * 18);
+      else lengthScore = 38 + (Math.random() * 20);
+      
+      // keyword presence: authority-boosting keywords
+      let keywordBonus = 0;
+      const keywords = ['shop', 'blog', 'news', 'tech', 'ai', 'cloud', 'hub', 'media', 'app', 'tool', 'edu', 'org', 'academy', 'insights'];
+      for (let kw of keywords) {
+        if (domain.includes(kw)) {
+          keywordBonus += 6 + Math.random() * 8;
+        }
+      }
+      // TLD bonus
+      let tldBonus = 0;
+      if (domain.endsWith('.com')) tldBonus = 7 + Math.random() * 6;
+      else if (domain.endsWith('.org')) tldBonus = 5 + Math.random() * 5;
+      else if (domain.endsWith('.io') || domain.endsWith('.app') || domain.endsWith('.net') || domain.endsWith('.dev')) tldBonus = 4 + Math.random() * 5;
+      else tldBonus = 2 + Math.random() * 4;
+      
+      const randomFactor = Math.random() * 14;
+      let rawScore = lengthScore + keywordBonus + tldBonus + randomFactor;
+      rawScore = Math.min(98, Math.max(12, rawScore));
+      let da = Math.floor(rawScore);
+      if (domain.includes('seo') || domain.includes('rank') || domain.includes('authority')) da = Math.min(99, da + 7);
+      if (domain.includes('spam') || domain.includes('zzz') || domain.includes('temp')) da = Math.max(12, da - 22);
+      return Math.min(100, Math.max(1, da));
+    }
+    
+    // Simulated Spam Score
+    function generateSpamScore(da, domain) {
+      let baseSpam = 0;
+      if (da > 70) baseSpam = 8 + Math.random() * 15;
+      else if (da > 45) baseSpam = 22 + Math.random() * 20;
+      else baseSpam = 42 + Math.random() * 32;
+      if (domain.includes('free') && domain.length > 10) baseSpam += 14;
+      if (domain.includes('casino') || domain.includes('poker') || domain.includes('bet')) baseSpam += 28;
+      if (domain.includes('xxx') || domain.includes('adult')) baseSpam += 35;
+      let spam = Math.min(98, Math.max(2, Math.floor(baseSpam)));
+      return spam;
+    }
+    
+    // Backlink Strength
+    function generateBacklinkStrength(da) {
+      let strength = da * 0.73 + (Math.random() * 16);
+      strength = Math.min(99, Math.max(6, Math.floor(strength)));
+      return strength;
+    }
+    
+    // Animate score (circular canvas and progress bar)
+    function animateResults(daFinal, spamFinal, backlinkFinal, domClean) {
+      resultsPanel.style.display = 'block';
+      resultsPanel.innerHTML = `
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title"><i class="fas fa-chart-simple"></i> Domain Authority Score</div>
+            <div class="metric-value" id="daValue">0</div>
+          </div>
+          <div class="circular-wrapper">
+            <div class="circular-progress" id="daCanvasContainer">
+              <canvas id="daCanvas" width="100" height="100" style="width:90px;height:90px;"></canvas>
+              <div class="circular-text" id="circularDaLabel">0</div>
+            </div>
+            <div class="score-info">
+              <div class="progress-bg"><div class="progress-fill" id="daProgressFill" style="width:0%"></div></div>
+              <small style="color:#475569;"><i class="fas fa-chart-line"></i> ranking potential</small>
+            </div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title"><i class="fas fa-shield-alt"></i> Spam Score</div>
+            <div class="metric-value" id="spamValue">0</div>
+          </div>
+          <div class="progress-bg"><div class="progress-fill" id="spamFill" style="width:0%; background: linear-gradient(90deg,#f97316,#ef4444);"></div></div>
+          <div style="font-size:0.7rem; margin-top:6px;"><i class="fas fa-info-circle"></i> Lower is better</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title"><i class="fas fa-link"></i> Backlink Strength</div>
+            <div class="metric-value" id="backlinkValue">0</div>
+          </div>
+          <div class="progress-bg"><div class="progress-fill" id="backlinkFill" style="width:0%; background: linear-gradient(90deg,#8b5cf6,#a855f7);"></div></div>
+          <div class="sub-metrics">
+            <span class="sub-item"><i class="fas fa-chart-line"></i> Referring domains: ${Math.floor(Math.random() * 6000 + 150)}K+ (simulated)</span>
+            <span class="sub-item"><i class="fas fa-globe"></i> ${domClean}</span>
+          </div>
+        </div>
+      `;
+      
+      const canvas = document.getElementById('daCanvas');
+      const ctx = canvas.getContext('2d');
+      const circTextSpan = document.getElementById('circularDaLabel');
+      const daValueSpan = document.getElementById('daValue');
+      const spamValueSpan = document.getElementById('spamValue');
+      const backlinkValueSpan = document.getElementById('backlinkValue');
+      const daProgressFill = document.getElementById('daProgressFill');
+      const spamFill = document.getElementById('spamFill');
+      const backlinkFill = document.getElementById('backlinkFill');
+      
+      let step = 0;
+      const duration = 1100;
+      const stepTime = 16;
+      const steps = duration / stepTime;
+      
+      function drawCircular(percent) {
+        if (!canvas || !ctx) return;
+        const val = percent / 100;
+        const angle = val * 2 * Math.PI;
+        const radius = 40;
+        const centerX = 50, centerY = 50;
+        ctx.clearRect(0, 0, 100, 100);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#e9eef3";
+        ctx.lineWidth = 8;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + angle);
+        ctx.strokeStyle = "#3b82f6";
+        ctx.lineWidth = 8;
+        ctx.stroke();
+      }
+      
+      function updateValues() {
+        step++;
+        const progress = Math.min(1, step / steps);
+        const newDA = Math.floor(daFinal * progress);
+        const newSpam = Math.floor(spamFinal * progress);
+        const newBack = Math.floor(backlinkFinal * progress);
+        
+        daValueSpan.innerText = newDA;
+        spamValueSpan.innerText = newSpam;
+        backlinkValueSpan.innerText = newBack;
+        circTextSpan.innerText = newDA;
+        
+        daProgressFill.style.width = `${(newDA / daFinal) * 100}%`;
+        spamFill.style.width = `${(newSpam / spamFinal) * 100}%`;
+        backlinkFill.style.width = `${(newBack / backlinkFinal) * 100}%`;
+        drawCircular((newDA / daFinal) * 100);
+        
+        if (step < steps) {
+          requestAnimationFrame(() => setTimeout(updateValues, stepTime));
+        } else {
+          daValueSpan.innerText = daFinal;
+          spamValueSpan.innerText = spamFinal;
+          backlinkValueSpan.innerText = backlinkFinal;
+          circTextSpan.innerText = daFinal;
+          daProgressFill.style.width = `100%`;
+          spamFill.style.width = `100%`;
+          backlinkFill.style.width = `100%`;
+          drawCircular(100);
+        }
+      }
+      
+      drawCircular(0);
+      updateValues();
+    }
+    
+    // Main estimation workflow
+    function estimateAuthority() {
+      clearError();
+      let rawDomain = domainInput.value;
+      if (!rawDomain || rawDomain.trim() === '') {
+        showError('⚠️ Please enter a domain name (e.g., example.com, github.io)');
+        return;
+      }
+      const cleaned = normalizeDomain(rawDomain);
+      if (!isValidDomain(cleaned)) {
+        showError('❌ Invalid domain format. Use format like "example.com" or "sub.domain.co"');
+        return;
+      }
+      
+      resultsPanel.style.display = 'none';
+      loadingArea.style.display = 'block';
+      
+      setTimeout(() => {
+        const daScore = generateDomainAuthority(cleaned);
+        const spamScore = generateSpamScore(daScore, cleaned);
+        const backStrength = generateBacklinkStrength(daScore);
+        
+        loadingArea.style.display = 'none';
+        animateResults(daScore, spamScore, backStrength, cleaned);
+      }, 850);
+    }
+    
+    function resetTool() {
+      domainInput.value = '';
+      clearError();
+      resultsPanel.style.display = 'none';
+      loadingArea.style.display = 'none';
+      domainInput.focus();
+    }
+    
+    checkBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      estimateAuthority();
+    });
+    
+    resetBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetTool();
+    });
+    
+    domainInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        estimateAuthority();
+      }
+    });
+    
+    domainInput.focus();
+  })();
+</script>
+</body>
+</html>
